@@ -90,7 +90,7 @@ const WRITE_BUFFER_PAUSE_THRESHOLD = 5;
  * The number of writes to perform in a single batch before allowing the
  * renderer to catch up with a 0ms setTimeout.
  */
-const WRITE_BATCH_SIZE = 300;
+const WRITE_BATCH_SIZE = 1024;
 
 const DEFAULT_OPTIONS: ITerminalOptions = {
   cols: 80,
@@ -1273,7 +1273,7 @@ export class Terminal extends EventEmitter implements ITerminal, IInputHandlingT
       // Kick off a write which will write all data in sequence recursively
       this._writeInProgress = true;
       // Kick off an async innerWrite so more writes can come in while processing data
-      setTimeout(() => {
+      requestAnimationFrame(() => {
         this._innerWrite();
       });
     }
@@ -1307,7 +1307,7 @@ export class Terminal extends EventEmitter implements ITerminal, IInputHandlingT
     }
     if (this.writeBuffer.length > 0) {
       // Allow renderer to catch up before processing the next batch
-      setTimeout(() => this._innerWrite(), 0);
+      this._innerWrite();
     } else {
       this._writeInProgress = false;
     }
